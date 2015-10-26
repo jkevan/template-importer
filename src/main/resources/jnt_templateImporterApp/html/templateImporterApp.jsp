@@ -25,7 +25,8 @@
     importer/libs/angular-route.min.js,
     importer/app.js,
     importer/partials/list/list.js,
-    importer/partials/view/view.js"/>
+    importer/partials/view/view.js,
+    importer/directives/iframeOnLoad.js"/>
 
 <div ng-app="template.importer">
     <ng-view/>

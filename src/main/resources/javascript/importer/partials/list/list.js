@@ -7,5 +7,6 @@ angular.module('template.importer.list', ['ngRoute'])
     }])
 
     .controller('ListCtrl', ['$scope', function($scope) {
-
+        // todo get list
+        // todo upload new project
     }]);
