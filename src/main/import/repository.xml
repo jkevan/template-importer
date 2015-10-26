@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<content xmlns:j="http://www.jahia.org/jahia/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0">
+    <modules jcr:primaryType="jnt:modules">
+        <template-importer j:dependencies="default"
+                         j:modulePriority="0"
+                         j:moduleType="module"
+                         j:title="Template importer"
+                         jcr:primaryType="jnt:module">
+                
+                <portlets jcr:primaryType="jnt:portletFolder"/>
+                <files jcr:primaryType="jnt:folder"/>
+                <contents jcr:primaryType="jnt:contentFolder"/>
+                <templates j:rootTemplatePath="/base" jcr:primaryType="jnt:templatesFolder">
+                    <files jcr:primaryType="jnt:folder"/>
+                    <contents jcr:primaryType="jnt:contentFolder"/>
+                    <server-settings-base j:view="serverSettings"
+                                  jcr:mixinTypes="jmix:useUILocale"
+                                  jcr:primaryType="jnt:template">
+                        <template-importer j:applyOn="jnt:globalSettings"
+                                 j:defaultTemplate="false"
+                                           j:hiddenTemplate="true"
+                                           jcr:primaryType="jnt:contentTemplate">
+                            <pagecontent jcr:primaryType="jnt:contentList">
+                                <templateimporterapp jcr:primaryType="jnt:templateImporterApp"/>
+                            </pagecontent>
+                        </template-importer>
+                    </server-settings-base>
+                </templates>
+                
+            </template-importer>
+    </modules>
+</content>
