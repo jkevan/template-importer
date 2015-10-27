@@ -1,4 +1,7 @@
-angular.module('template.importer.view', ['ngRoute', 'template.importer.directive.iframeOnLoad'])
+angular.module('template.importer.view', ['ngRoute',
+    'template.importer.directive.iframeOnLoad',
+    'template.importer.service.visualDomSelector'])
+
     .config(['$routeProvider', function($routeProvider) {
         $routeProvider.when('/view/:projectId', {
             templateUrl: templateImporter.moduleBase + '/javascript/importer/partials/view/view.html',
@@ -6,11 +9,11 @@ angular.module('template.importer.view', ['ngRoute', 'template.importer.directiv
         });
     }])
 
-    .controller('ViewCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
+    .controller('ViewCtrl', ['$scope', '$routeParams', 'domSelectorService', function($scope, $routeParams, domSelectorService) {
         var projectId =  $routeParams.projectId;
         $scope.projectUrl = templateImporter.moduleBase + '/javascript/importer/projects/' + projectId + "/" + projectId + ".html"
 
-        $scope.iframeLoadedCallBack = function (element) {
-            console.log("IFRAME LOADED")
+        $scope.iframeLoadedCallBack = function (event) {
+            domSelectorService.start(event.target.contentDocument.body);
         };
     }]);

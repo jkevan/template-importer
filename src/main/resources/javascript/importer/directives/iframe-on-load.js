@@ -5,9 +5,9 @@ angular.module('template.importer.directive.iframeOnLoad', [])
                 callBack: '@iframeOnload'
             },
             link: function (scope, element, attrs) {
-                element.on('load', function () {
+                element.on('load', function (event) {
                     if (scope.$parent[scope.callBack]) {
-                        scope.$parent[scope.callBack](element);
+                        scope.$parent[scope.callBack](event);
                     }
                 })
             }
