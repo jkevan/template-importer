@@ -65,9 +65,13 @@ angular.module('template.importer.service.visualDomSelector', [])
             return self.elements.window.scrollTop();
         }
 
-        this.start = function(element) {
+        this.start = function(element, iframeElt) {
             initStylesheet();
             createOutlineElements();
+
+            var parent_top = iframeElt != undefined ? iframeElt.getBoundingClientRect().top : 0;
+            var parent_left = iframeElt != undefined ? iframeElt.getBoundingClientRect().left : 0;
+
             jQuery(element).on('mousemove.DomOutline', function(e) {
                 if (e.target.className.indexOf('DomOutline') !== -1) {
                     return;
@@ -76,17 +80,18 @@ angular.module('template.importer.service.visualDomSelector', [])
                 var b = 2;
                 var scroll_top = getScrollTop();
                 var pos = e.target.getBoundingClientRect();
-                var top = pos.top + scroll_top;
+                var top = pos.top + scroll_top + parent_top;
+                var left = pos.left + parent_left;
 
                 var label_text = compileLabelText(e.target, pos.width, pos.height);
                 var label_top = Math.max(0, top - 20 - b, scroll_top);
-                var label_left = Math.max(0, pos.left - b);
+                var label_left = Math.max(0, left - b);
 
                 self.elements.label.css({ top: label_top, left: label_left }).text(label_text);
-                self.elements.top.css({ top: Math.max(0, top - b), left: pos.left - b, width: pos.width + b, height: b });
-                self.elements.bottom.css({ top: top + pos.height, left: pos.left - b, width: pos.width + b, height: b });
-                self.elements.left.css({ top: top - b, left: Math.max(0, pos.left - b), width: b, height: pos.height + b });
-                self.elements.right.css({ top: top - b, left: pos.left + pos.width, width: b, height: pos.height + (b * 2) });
+                self.elements.top.css({ top: Math.max(0, top - b), left: left - b, width: pos.width + b, height: b });
+                self.elements.bottom.css({ top: top + pos.height, left: left - b, width: pos.width + b, height: b });
+                self.elements.left.css({ top: top - b, left: Math.max(0,left - b), width: b, height: pos.height + b });
+                self.elements.right.css({ top: top - b, left: left + pos.width, width: b, height: pos.height + (b * 2) });
             });
         };
 
