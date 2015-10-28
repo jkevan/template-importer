@@ -4,8 +4,10 @@ angular.module('template.importer.service.visualDomSelector', [])
             outlineElts: {}
         };
 
-        function initStylesheet() {
-            var css = '' +
+        function init(document) {
+            context._document = jQuery(document ? document : window.document);
+
+            var css = "<style type='text/css'>" +
                 '.DomOutline {' +
                 '    background: #09c;' +
                 '    position: absolute;' +
@@ -20,20 +22,10 @@ angular.module('template.importer.service.visualDomSelector', [])
                 '    position: absolute;' +
                 '    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);' +
                 '    z-index: 1000001;' +
-                '}';
+                '}</style>';
 
-            var element = context.document.createElement('style');
-            element.type = 'text/css';
-            context.document.getElementsByTagName('head')[0].appendChild(element);
+            jQuery(css).appendTo(context._document.find("head"));
 
-            if (element.styleSheet) {
-                element.styleSheet.cssText = css; // IE
-            } else {
-                element.innerHTML = css; // Non-IE
-            }
-        }
-
-        function createOutlineElements() {
             context.outlineElts.label = jQuery('<div></div>').addClass('DomOutline_label').appendTo(context._document.find("body"));
             context.outlineElts.top = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
             context.outlineElts.bottom = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
@@ -59,12 +51,9 @@ angular.module('template.importer.service.visualDomSelector', [])
         }
 
         this.start = function(document) {
-            context.document = document ? document : window.document;
-            context._document = jQuery(document);
-            initStylesheet();
-            createOutlineElements();
+            init(document);
 
-            jQuery("body", context.document).on('mousemove.DomOutline', function(e) {
+            context._document.find("body").on('mousemove.DomOutline', function(e) {
                 if (e.target.className.indexOf('DomOutline') !== -1) {
                     return;
                 }
@@ -89,6 +78,6 @@ angular.module('template.importer.service.visualDomSelector', [])
 
         this.stop = function () {
             removeOutlineElements();
-            jQuery('body').off('mousemove.DomOutline');
+            context._document.find("body").off('mousemove.DomOutline');
         };
     }]);
