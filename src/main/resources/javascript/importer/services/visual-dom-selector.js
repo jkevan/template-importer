@@ -1,7 +1,7 @@
 angular.module('template.importer.service.visualDomSelector', [])
     .service('domSelectorService', [function(){
-        var self = {
-            elements: {}
+        var context = {
+            outlineElts: {}
         };
 
         function initStylesheet() {
@@ -22,9 +22,9 @@ angular.module('template.importer.service.visualDomSelector', [])
                 '    z-index: 1000001;' +
                 '}';
 
-            var element = document.createElement('style');
+            var element = context.document.createElement('style');
             element.type = 'text/css';
-            document.getElementsByTagName('head')[0].appendChild(element);
+            context.document.getElementsByTagName('head')[0].appendChild(element);
 
             if (element.styleSheet) {
                 element.styleSheet.cssText = css; // IE
@@ -34,15 +34,15 @@ angular.module('template.importer.service.visualDomSelector', [])
         }
 
         function createOutlineElements() {
-            self.elements.label = jQuery('<div></div>').addClass('DomOutline_label').appendTo('body');
-            self.elements.top = jQuery('<div></div>').addClass('DomOutline').appendTo('body');
-            self.elements.bottom = jQuery('<div></div>').addClass('DomOutline').appendTo('body');
-            self.elements.left = jQuery('<div></div>').addClass('DomOutline').appendTo('body');
-            self.elements.right = jQuery('<div></div>').addClass('DomOutline').appendTo('body');
+            context.outlineElts.label = jQuery('<div></div>').addClass('DomOutline_label').appendTo(context._document.find("body"));
+            context.outlineElts.top = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
+            context.outlineElts.bottom = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
+            context.outlineElts.left = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
+            context.outlineElts.right = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
         }
 
         function removeOutlineElements() {
-            jQuery.each(self.elements, function(name, element) {
+            jQuery.each(context.outlineElts, function(name, element) {
                 element.remove();
             });
         }
@@ -58,40 +58,32 @@ angular.module('template.importer.service.visualDomSelector', [])
             return label + ' (' + Math.round(width) + 'x' + Math.round(height) + ')';
         }
 
-        function getScrollTop() {
-            if (!self.elements.window) {
-                self.elements.window = jQuery(window);
-            }
-            return self.elements.window.scrollTop();
-        }
-
-        this.start = function(element, iframeElt) {
+        this.start = function(document) {
+            context.document = document ? document : window.document;
+            context._document = jQuery(document);
             initStylesheet();
             createOutlineElements();
 
-            var parent_top = iframeElt != undefined ? iframeElt.getBoundingClientRect().top : 0;
-            var parent_left = iframeElt != undefined ? iframeElt.getBoundingClientRect().left : 0;
-
-            jQuery(element).on('mousemove.DomOutline', function(e) {
+            jQuery("body", context.document).on('mousemove.DomOutline', function(e) {
                 if (e.target.className.indexOf('DomOutline') !== -1) {
                     return;
                 }
 
                 var b = 2;
-                var scroll_top = getScrollTop();
+                var scroll_top = context._document.scrollTop();
                 var pos = e.target.getBoundingClientRect();
-                var top = pos.top + scroll_top + parent_top;
-                var left = pos.left + parent_left;
+                var top = pos.top + scroll_top;
+                var left = pos.left;
 
                 var label_text = compileLabelText(e.target, pos.width, pos.height);
                 var label_top = Math.max(0, top - 20 - b, scroll_top);
                 var label_left = Math.max(0, left - b);
 
-                self.elements.label.css({ top: label_top, left: label_left }).text(label_text);
-                self.elements.top.css({ top: Math.max(0, top - b), left: left - b, width: pos.width + b, height: b });
-                self.elements.bottom.css({ top: top + pos.height, left: left - b, width: pos.width + b, height: b });
-                self.elements.left.css({ top: top - b, left: Math.max(0,left - b), width: b, height: pos.height + b });
-                self.elements.right.css({ top: top - b, left: left + pos.width, width: b, height: pos.height + (b * 2) });
+                context.outlineElts.label.css({ top: label_top, left: label_left }).text(label_text);
+                context.outlineElts.top.css({ top: Math.max(0, top - b), left: left - b, width: pos.width + b, height: b });
+                context.outlineElts.bottom.css({ top: top + pos.height, left: left - b, width: pos.width + b, height: b });
+                context.outlineElts.left.css({ top: top - b, left: Math.max(0,left - b), width: b, height: pos.height + b });
+                context.outlineElts.right.css({ top: top - b, left: left + pos.width, width: b, height: pos.height + (b * 2) });
             });
         };
 

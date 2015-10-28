@@ -14,6 +14,6 @@ angular.module('template.importer.view', ['ngRoute',
         $scope.projectUrl = templateImporter.moduleBase + '/javascript/importer/projects/' + projectId + "/" + projectId + ".html"
 
         $scope.iframeLoadedCallBack = function (event) {
-            domSelectorService.start(event.target.contentDocument.body, event.target);
+            domSelectorService.start(event.target.contentDocument);
         };
     }]);
