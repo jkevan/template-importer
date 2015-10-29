@@ -21,15 +21,14 @@
     };
 </script>
 
-<template:addResources type="javascript"  resources="importer/libs/angular.min.js,
-    importer/libs/angular-route.min.js,
+<template:addResources type="javascript" resources="
     importer/app.js,
     importer/services/visual-dom-selector.js,
     importer/directives/iframe-on-load.js,
-    importer/partials/list/list.js,
-    importer/partials/view/view.js,
+    importer/directives/importer.js
     "/>
+<template:addResources type="css" resources="importer/app.css"/>
 
-<div ng-app="template.importer">
-    <ng-view/>
-</div>
+<section ng-app="template.importer">
+    <importer></importer>
+</section>

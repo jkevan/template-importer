@@ -1,4 +1,4 @@
-angular.module('template.importer.directive.iframeOnLoad', [])
+angular.module('template.importer')
     .directive('iframeOnload', [function () {
         return {
             scope: {

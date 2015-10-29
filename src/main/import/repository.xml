@@ -19,6 +19,7 @@
                         <template-importer j:applyOn="jnt:globalSettings"
                                  j:defaultTemplate="false"
                                            j:hiddenTemplate="true"
+                                  j:view="importer"
                                            jcr:primaryType="jnt:contentTemplate">
                             <pagecontent jcr:primaryType="jnt:contentList">
                                 <templateimporterapp jcr:primaryType="jnt:templateImporterApp"/>

@@ -1,11 +1,11 @@
-angular.module('template.importer.service.visualDomSelector', [])
+angular.module('template.importer')
     .service('domSelectorService', [function(){
         var context = {
             outlineElts: {}
         };
 
         function init(document) {
-            context._document = jQuery(document ? document : window.document);
+            context._document = angular.element(document ? document : window.document);
 
             var css = "<style type='text/css'>" +
                 '.DomOutline {' +
@@ -24,17 +24,17 @@ angular.module('template.importer.service.visualDomSelector', [])
                 '    z-index: 1000001;' +
                 '}</style>';
 
-            jQuery(css).appendTo(context._document.find("head"));
+            angular.element(css).appendTo(context._document.find("head"));
 
-            context.outlineElts.label = jQuery('<div></div>').addClass('DomOutline_label').appendTo(context._document.find("body"));
-            context.outlineElts.top = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
-            context.outlineElts.bottom = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
-            context.outlineElts.left = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
-            context.outlineElts.right = jQuery('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
+            context.outlineElts.label = angular.element('<div></div>').addClass('DomOutline_label').appendTo(context._document.find("body"));
+            context.outlineElts.top = angular.element('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
+            context.outlineElts.bottom = angular.element('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
+            context.outlineElts.left = angular.element('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
+            context.outlineElts.right = angular.element('<div></div>').addClass('DomOutline').appendTo(context._document.find("body"));
         }
 
         function removeOutlineElements() {
-            jQuery.each(context.outlineElts, function(name, element) {
+            angular.forEach(context.outlineElts, function(element, key) {
                 element.remove();
             });
         }
@@ -45,7 +45,7 @@ angular.module('template.importer.service.visualDomSelector', [])
                 label += '#' + element.id;
             }
             if (element.className) {
-                label += ('.' + jQuery.trim(element.className).replace(/ /g, '.')).replace(/\.\.+/g, '.');
+                label += ('.' + element.className.trim().replace(/ /g, '.')).replace(/\.\.+/g, '.');
             }
             return label + ' (' + Math.round(width) + 'x' + Math.round(height) + ')';
         }
