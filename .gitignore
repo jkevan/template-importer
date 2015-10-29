@@ -1,6 +1,7 @@
 /.classpath
 /.project
 /.settings
+/bower_components
 .idea
 *.iml
 *.ipr
