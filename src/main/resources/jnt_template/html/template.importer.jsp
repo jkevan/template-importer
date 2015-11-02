@@ -37,6 +37,11 @@
     <c:if test="${!empty author}"><meta name="author" content="${author.string}" /></c:if>
     <c:if test="${!empty keywords}"><meta name="keywords" content="${keywords}" /></c:if>
     <title>${fn:escapeXml(renderContext.mainResource.node.displayableName)}</title>
+    <script>
+        templateImporter = {
+            moduleBase: "${url.currentModule}"
+        };
+    </script>
 </head>
 <body>
     <template:area path="pagecontent"/>

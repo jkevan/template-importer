@@ -15,12 +15,6 @@
 <%--@elvariable id="currentResource" type="org.jahia.services.render.Resource"--%>
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 
-<script>
-    templateImporter = {
-        moduleBase: "${url.currentModule}"
-    };
-</script>
-
 <template:addResources type="javascript" resources="
     importer/app.js,
     importer/services/visual-dom-selector.js,

@@ -7,6 +7,13 @@ angular.module('template.importer')
 
                 $scope.iframeLoadedCallBack = function (event) {
                     domSelectorService.start(event.target.contentDocument);
+                    domSelectorService.configureBinding("contextmenu", function(event) {
+                        $scope.$apply(function() {
+                            event.preventDefault();
+                            //fn(scope, {$event:event});
+                            console.log("context menu:" + event.target)
+                        });
+                    })
                 };
             }]
         }
