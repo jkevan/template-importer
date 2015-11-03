@@ -17,12 +17,13 @@
 
 <template:addResources type="javascript" resources="
     importer/app.js,
-    importer/services/visual-dom-selector.js,
-    importer/directives/iframe-on-load.js,
-    importer/directives/importer.js
+    importer/services/ti-visual-dom-selector.js,
+    importer/directives/ti-iframe-on-load.js,
+    importer/directives/ti-catch-open-menu.js,
+    importer/directives/ti-importer.js
     "/>
 <template:addResources type="css" resources="importer/app.css"/>
 
 <section ng-app="template.importer">
-    <importer></importer>
+    <ti-importer></ti-importer>
 </section>

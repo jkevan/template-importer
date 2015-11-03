@@ -1,8 +1,8 @@
 angular.module('template.importer')
-    .directive('iframeOnload', [function () {
+    .directive('tiIframeOnload', [function () {
         return {
             scope: {
-                callBack: '@iframeOnload'
+                callBack: '@tiIframeOnload'
             },
             link: function (scope, element, attrs) {
                 element.on('load', function (event) {

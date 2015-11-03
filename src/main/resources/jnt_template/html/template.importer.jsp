@@ -16,11 +16,11 @@
 <%--@elvariable id="url" type="org.jahia.services.render.URLGenerator"--%>
 <template:addResources type="javascript"  resources="
     importer/libs/jquery.min.js,
-    importer/libs/angular.min.js,
+    importer/libs/angular.js,
     importer/libs/angular-route.min.js,
     importer/libs/angular-animate.min.js,
     importer/libs/angular-aria.min.js,
-    importer/libs/angular-material.min.js,
+    importer/libs/angular-material.js,
     importer/libs/underscore-min.js,
     importer/libs/underscore.string.min.js
     "/>
