@@ -9,16 +9,31 @@
             </li>
         </ul>
     </md-sidenav>
-    <md-content class="layout-padding flex">
-        <iframe ng-src="{{ctx.projectUrl}}" style="width: 100%; display: block; border: none;" ti-iframe-onload="iframeLoadedCallBack"></iframe>
-    </md-content>
+    <div class="layout-column flex">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <span>Snowboard project</span>
+                <!-- fill up the space between left and right area -->
+                <span flex></span>
+                <md-button>
+                    save
+                </md-button>
+                <md-button>
+                    import
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-content class="layout-padding flex">
+            <iframe ng-if="ctx.projectUrl" ng-src="{{ctx.projectUrl}}" style="width: 100%; display: block; border: none;" ti-iframe-onload="iframeLoadedCallBack"></iframe>
+        </md-content>
+    </div>
 </div>
 
 <md-menu>
     <ti-catch-open-menu ti-open-menu="$mdOpenMenu()" ti-model="ctx.openMenuFct" md-menu-origin class="testkevan" ng-style="{left: ctx.ctxMenuPosition.left, top: ctx.ctxMenuPosition.top}"></ti-catch-open-menu>
     <md-menu-content width="4">
         <md-menu-item>
-            <md-button ng-click="exportAsArea($event)">
+            <md-button ng-click="exportAsArea()">
                 Export as area
             </md-button>
         </md-menu-item>

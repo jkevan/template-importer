@@ -39,7 +39,9 @@
     <title>${fn:escapeXml(renderContext.mainResource.node.displayableName)}</title>
     <script>
         templateImporter = {
-            moduleBase: "${url.currentModule}"
+            moduleBase: "${url.currentModule}",
+            uiLocale: "${renderContext.UILocale}",
+            jcrRestAPIBase: "/modules/api/jcr/v1"
         };
     </script>
 </head>

@@ -100,7 +100,7 @@ templateImporter.VisualDomSelector = function(config){
 };
 
 angular.module('template.importer')
-    .provider('domSelectorService', function DomSelectorServiceProvider() {
+    .provider('tiDomSelectorService', function DomSelectorServiceProvider() {
         var config = {};
 
         // this is an empty provider in case of the domSelectorService need to be configurable in futur, enhance this provider.

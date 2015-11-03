@@ -2,23 +2,29 @@ angular.module('template.importer')
     .directive('tiImporter', [function () {
         return {
             templateUrl: templateImporter.moduleBase + "/javascript/importer/directives/ti-importer.html",
-            controller: ['$scope', '$timeout', 'domSelectorService', function($scope, $timeout, domSelectorService) {
+            controller: ['$scope', '$timeout', 'tiDomSelectorService', 'tiProjectService', function($scope, $timeout, tiDomSelectorService, tiProjectService) {
                 var iframe = undefined;
                 var _innerDoc = undefined;
                 $scope.ctx = {
-                    projectUrl: templateImporter.moduleBase + "/javascript/importer/projects/snowboard/snowboard.html",
+                    projectUrl: undefined,
                     openMenuFct : null,
+                    lastSelectedElement: null,
                     ctxMenuPosition : {
                         left: 0,
                         top: 0
                     }
                 };
 
+                tiProjectService.getProjects().success(function(data) {
+                    console.log("YOLO");
+                });
+
                 $scope.iframeLoadedCallBack = function (event) {
                     iframe = event.target;
                     _innerDoc = angular.element(iframe.contentDocument);
-                    domSelectorService.start(iframe.contentDocument);
-                    domSelectorService.configureBinding("contextmenu", function(event) {
+                    tiDomSelectorService.start(iframe.contentDocument);
+                    tiDomSelectorService.configureBinding("contextmenu", function(event) {
+                        $scope.ctx.lastSelectedElement = event.target;
                         event.preventDefault();
                         $scope.$apply(function(){
                             _calculatePositionOfCtxMenu(event);
@@ -32,6 +38,10 @@ angular.module('template.importer')
                         })
                     });
                     _adjustIframeHeight();
+                };
+
+                $scope.exportAsArea = function() {
+                    console.log("yolo")
                 };
 
                 var _calculatePositionOfCtxMenu = function(event) {
