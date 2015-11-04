@@ -37,13 +37,6 @@
     <c:if test="${!empty author}"><meta name="author" content="${author.string}" /></c:if>
     <c:if test="${!empty keywords}"><meta name="keywords" content="${keywords}" /></c:if>
     <title>${fn:escapeXml(renderContext.mainResource.node.displayableName)}</title>
-    <script>
-        templateImporter = {
-            moduleBase: "${url.currentModule}",
-            uiLocale: "${renderContext.UILocale}",
-            jcrRestAPIBase: "/modules/api/jcr/v1"
-        };
-    </script>
 </head>
 <body>
     <template:area path="pagecontent"/>

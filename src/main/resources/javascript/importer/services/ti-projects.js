@@ -1,9 +1,9 @@
 angular.module('template.importer')
-    .service('tiProjectService', ['$http', function ($http) {
+    .service('tiProjectService', ['$http', 'tiContextInfos', function ($http, tiContextInfos) {
         this.buildURL = function (workspace, locale, type, endUrl) {
-            return [templateImporter.jcrRestAPIBase,
+            return [tiContextInfos.jcrRestAPIBase,
                     workspace ? workspace : "default",
-                    locale ? locale : templateImporter.uiLocale,
+                    locale ? locale : tiContextInfos.uiLocale,
                     type ? type : "nodes"].join("/") + endUrl;
         };
 

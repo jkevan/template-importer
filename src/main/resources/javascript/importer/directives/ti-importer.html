@@ -4,22 +4,19 @@
             <h1 class="md-toolbar-tools">Template importer</h1>
         </md-toolbar>
         <ul>
-            <li>
-                <a href="#">snowboard project</a>
+            <li ng-repeat="project in ctx.projects">
+                <a href="#" ng-click="selectProject(project)">{{project}}</a>
             </li>
         </ul>
     </md-sidenav>
     <div class="layout-column flex">
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <span>Snowboard project</span>
+                <span>{{ctx.selectedProject}}</span>
                 <!-- fill up the space between left and right area -->
                 <span flex></span>
-                <md-button>
+                <md-button ng-show="ctx.selectedProject">
                     save
-                </md-button>
-                <md-button>
-                    import
                 </md-button>
             </div>
         </md-toolbar>

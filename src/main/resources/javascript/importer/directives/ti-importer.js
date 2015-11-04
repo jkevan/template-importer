@@ -1,11 +1,13 @@
 angular.module('template.importer')
-    .directive('tiImporter', [function () {
+    .directive('tiImporter', ['tiContextInfos', function (tiContextInfos) {
         return {
-            templateUrl: templateImporter.moduleBase + "/javascript/importer/directives/ti-importer.html",
+            templateUrl: tiContextInfos.moduleBase + "/javascript/importer/directives/ti-importer.html",
             controller: ['$scope', '$timeout', 'tiDomSelectorService', 'tiProjectService', function($scope, $timeout, tiDomSelectorService, tiProjectService) {
                 var iframe = undefined;
                 var _innerDoc = undefined;
                 $scope.ctx = {
+                    projects:[],
+                    projectIsDisplay:false,
                     projectUrl: undefined,
                     openMenuFct : null,
                     lastSelectedElement: null,
@@ -16,8 +18,17 @@ angular.module('template.importer')
                 };
 
                 tiProjectService.getProjects().success(function(data) {
-                    console.log("YOLO");
+                    if(data && data.children) {
+                        angular.forEach(data.children, function(child, nodeName) {
+                            $scope.ctx.projects.push(nodeName)
+                        })
+                    }
                 });
+
+                $scope.selectProject = function (project) {
+                    $scope.ctx.selectedProject = project;
+                    $scope.ctx.projectUrl = tiContextInfos.filesBase + "/sites/systemsite/files/ti-projects/" + project + "/index.html";
+                };
 
                 $scope.iframeLoadedCallBack = function (event) {
                     iframe = event.target;
@@ -41,7 +52,8 @@ angular.module('template.importer')
                 };
 
                 $scope.exportAsArea = function() {
-                    console.log("yolo")
+                    console.log("yolo");
+                    //  TODO
                 };
 
                 var _calculatePositionOfCtxMenu = function(event) {

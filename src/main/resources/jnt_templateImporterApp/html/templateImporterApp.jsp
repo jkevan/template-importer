@@ -23,6 +23,17 @@
     importer/directives/ti-catch-open-menu.js,
     importer/directives/ti-importer.js
     "/>
+<template:addResources>
+    <script>
+        angular.module('template.importer')
+                .constant('tiContextInfos', {
+                    moduleBase: "${url.currentModule}",
+                    filesBase: "${url.files}",
+                    uiLocale: "${renderContext.UILocale}",
+                    jcrRestAPIBase: "/modules/api/jcr/v1"
+                });
+    </script>
+</template:addResources>
 <template:addResources type="css" resources="importer/app.css"/>
 
 <section ng-app="template.importer">
