@@ -35,7 +35,7 @@ angular.module('template.importer')
                     _innerDoc = angular.element(iframe.contentDocument);
                     tiDomSelectorService.start(iframe.contentDocument);
                     tiDomSelectorService.configureBinding("contextmenu", function(event) {
-                        $scope.ctx.lastSelectedElement = event.target;
+                        $scope.ctx.lastSelectedElement = angular.element(event.target);
                         event.preventDefault();
                         $scope.$apply(function(){
                             _calculatePositionOfCtxMenu(event);
@@ -51,9 +51,26 @@ angular.module('template.importer')
                     _adjustIframeHeight();
                 };
 
-                $scope.exportAsArea = function() {
+                $scope.save = function() {
                     console.log("yolo");
-                    //  TODO
+                    tiDomSelectorService.stop();
+                    var doc = new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
+                    tiProjectService.saveProject($scope.ctx.selectedProject, doc).success(function() {
+
+                    });
+                };
+
+                $scope.export = function () {
+
+                };
+
+                $scope.exportAsArea = function() {
+                    // open modal form to be able to set detail about this area
+                    var area = {
+                        path: _generateId(),
+
+                    };
+                    $scope.ctx.lastSelectedElement.attr("ti-area", JSON.stringify(area))
                 };
 
                 var _calculatePositionOfCtxMenu = function(event) {
@@ -63,6 +80,10 @@ angular.module('template.importer')
 
                 var _adjustIframeHeight = function() {
                     angular.element(iframe).css('height', angular.element(window).height() - iframe.getBoundingClientRect().top);
+                };
+
+                var _generateId = function() {
+                    return '_' + Math.random().toString(36).substr(2, 9);
                 }
             }]
         }

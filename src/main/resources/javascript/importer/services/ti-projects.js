@@ -10,4 +10,10 @@ angular.module('template.importer')
         this.getProjects = function () {
             return $http.get(this.buildURL(undefined, undefined, "paths", "/sites/systemsite/files/ti-projects"));
         };
+
+        this.saveProject = function(project, html) {
+            return $http.put(this.buildURL(undefined, undefined, "paths",
+                "/sites/systemsite/files/ti-projects/" + project + "/index.html/jcr:content/properties/jcr:data"),
+                {"value": html});
+        }
     }]);
