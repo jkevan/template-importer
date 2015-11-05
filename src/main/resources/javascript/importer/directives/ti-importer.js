@@ -56,7 +56,8 @@ angular.module('template.importer')
                     tiDomSelectorService.stop();
                     var doc = new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
                     tiProjectService.saveProject($scope.ctx.selectedProject, doc).success(function() {
-
+                        delete $scope.ctx.projectUrl;
+                        $scope.selectProject($scope.ctx.selectedProject);
                     });
                 };
 
@@ -65,7 +66,7 @@ angular.module('template.importer')
                 };
 
                 $scope.exportAsArea = function() {
-                    // open modal form to be able to set detail about this area
+                    // TODO open modal form to be able to set detail about this area
                     var area = {
                         path: _generateId(),
 
