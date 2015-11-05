@@ -51,27 +51,30 @@ angular.module('template.importer')
                     _adjustIframeHeight();
                 };
 
-                $scope.save = function() {
-                    console.log("yolo");
+                $scope.saveProject = function() {
+                    console.log("ti: saving project " + $scope.ctx.selectedProject);
                     tiDomSelectorService.stop();
                     var doc = new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
                     tiProjectService.saveProject($scope.ctx.selectedProject, doc).success(function() {
-                        delete $scope.ctx.projectUrl;
-                        $scope.selectProject($scope.ctx.selectedProject);
+                        console.log("ti: project " + $scope.ctx.selectedProject + " saved")
                     });
                 };
 
-                $scope.export = function () {
-
+                $scope.exportProject = function () {
+                    console.log("ti: exporting project " + $scope.ctx.selectedProject);
+                    _innerDoc.find("[ti-area]").each(function(key, element) {
+                        console.log("ti: apply area rule");
+                        angular.element(element).replaceWith("<div>test</div>");
+                    });
                 };
 
                 $scope.exportAsArea = function() {
                     // TODO open modal form to be able to set detail about this area
                     var area = {
-                        path: _generateId(),
+                        path: _generateId()
 
                     };
-                    $scope.ctx.lastSelectedElement.attr("ti-area", JSON.stringify(area))
+                    $scope.ctx.lastSelectedElement.attr("ti-area", JSON.stringify(area));
                 };
 
                 var _calculatePositionOfCtxMenu = function(event) {
