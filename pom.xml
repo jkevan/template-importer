@@ -92,6 +92,64 @@
         <developerConnection>scm:dummy:uri</developerConnection>
     </scm>
 
+    <properties>
+        <jersey.version>2.6</jersey.version>
+        <jackson-annotations.version>2.5.0</jackson-annotations.version>
+        <jackson.version>2.5.0</jackson.version>
+        <jahia-depends>default,jaxrs-osgi-extender,serverSettings,tabularList</jahia-depends>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.eclipse.gemini.blueprint</groupId>
+            <artifactId>gemini-blueprint-core</artifactId>
+            <version>1.0.2.RELEASE</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.bundles</groupId>
+            <artifactId>jaxrs-ri</artifactId>
+            <version>${jersey.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>${jersey.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-annotations.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-base</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+    </dependencies>
+
     <repositories>
         <repository>
             <id>jahia-public</id>
@@ -115,7 +173,10 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Jahia-Depends>default</Jahia-Depends>
+                        <Jahia-Module-Type>system</Jahia-Module-Type>
+                        <Jahia-Deploy-On-Site>system</Jahia-Deploy-On-Site>
+                        <JAX-RS-Application>org.jahia.modules.template.importer.rest.TemplateImporterApp</JAX-RS-Application>
+                        <JAX-RS-Alias>/api/ti/v1</JAX-RS-Alias>
                     </instructions>
                 </configuration>
             </plugin>
