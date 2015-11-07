@@ -19,6 +19,7 @@
     importer/app.js,
     importer/services/ti-visual-dom-selector.js,
     importer/services/ti-projects.js,
+    importer/services/ti-dialogs.js,
     importer/directives/ti-iframe-on-load.js,
     importer/directives/ti-catch-open-menu.js,
     importer/directives/ti-importer.js
