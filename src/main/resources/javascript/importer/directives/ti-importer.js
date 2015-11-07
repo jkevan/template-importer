@@ -19,22 +19,21 @@ angular.module('template.importer')
                         }
                     };
 
-                    var headers = "<%@ page language=\"java\" contentType=\"text/html;charset=UTF-8\" %> \
-                    <!DOCTYPE html> \
-                    <%@ taglib prefix=\"template\" uri=\"http://www.jahia.org/tags/templateLib\" %> \
-                    <%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/core\" %> \
-                    <%@ taglib prefix=\"fn\" uri=\"http://java.sun.com/jsp/jstl/functions\" %> \
-                    <%@ taglib prefix=\"jcr\" uri=\"http://www.jahia.org/tags/jcr\" %> \
-                    <%@ taglib prefix=\"fmt\" uri=\"http://java.sun.com/jstl/fmt_rt\" %> \
-                    <%@ taglib prefix=\"functions\" uri=\"http://www.jahia.org/tags/functions\" %> \
-                    <%--@elvariable id=\"currentNode\" type=\"org.jahia.services.content.JCRNodeWrapper\"--%> \
-                    <%--@elvariable id=\"out\" type=\"java.io.PrintWriter\"--%> \
-                    <%--@elvariable id=\"script\" type=\"org.jahia.services.render.scripting.Script\"--%> \
-                    <%--@elvariable id=\"scriptInfo\" type=\"java.lang.String\"--%> \
-                    <%--@elvariable id=\"workspace\" type=\"java.lang.String\"--%> \
-                    <%--@elvariable id=\"renderContext\" type=\"org.jahia.services.render.RenderContext\"--%> \
-                    <%--@elvariable id=\"currentResource\" type=\"org.jahia.services.render.Resource\"--%> \
-                    <%--@elvariable id=\"url\" type=\"org.jahia.services.render.URLGenerator\"--%>";
+                    var headers = "<%@ page language=\"java\" contentType=\"text/html;charset=UTF-8\" %>\
+                    \r\n<%@ taglib prefix=\"template\" uri=\"http://www.jahia.org/tags/templateLib\" %>\
+                    \r\n<%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/core\" %>\
+                    \r\n<%@ taglib prefix=\"fn\" uri=\"http://java.sun.com/jsp/jstl/functions\" %>\
+                    \r\n<%@ taglib prefix=\"jcr\" uri=\"http://www.jahia.org/tags/jcr\" %>\
+                    \r\n<%@ taglib prefix=\"fmt\" uri=\"http://java.sun.com/jstl/fmt_rt\" %>\
+                    \r\n<%@ taglib prefix=\"functions\" uri=\"http://www.jahia.org/tags/functions\" %>\
+                    \r\n<%--@elvariable id=\"currentNode\" type=\"org.jahia.services.content.JCRNodeWrapper\"--%>\
+                    \r\n<%--@elvariable id=\"out\" type=\"java.io.PrintWriter\"--%>\
+                    \r\n<%--@elvariable id=\"script\" type=\"org.jahia.services.render.scripting.Script\"--%>\
+                    \r\n<%--@elvariable id=\"scriptInfo\" type=\"java.lang.String\"--%>\
+                    \r\n<%--@elvariable id=\"workspace\" type=\"java.lang.String\"--%>\
+                    \r\n<%--@elvariable id=\"renderContext\" type=\"org.jahia.services.render.RenderContext\"--%>\
+                    \r\n<%--@elvariable id=\"currentResource\" type=\"org.jahia.services.render.Resource\"--%>\
+                    \r\n<%--@elvariable id=\"url\" type=\"org.jahia.services.render.URLGenerator\"--%>";
 
                     tiProjectService.getProjects().success(function (data) {
                         if (data && data.children) {
@@ -77,19 +76,25 @@ angular.module('template.importer')
                             .then(function (exportDialData) {
                                 $scope.ctx.loading = true;
                                 console.log("ti: exporting project " + $scope.ctx.selectedProject + " to module: " + exportDialData.module + " " + exportDialData.version);
+                                tiDomSelectorService.stop();
 
-                                var folderOfAssets = undefined;
-                                _rewriteAreas();
-                                folderOfAssets = _replaceByTemplateAddResources("script", "src", "javascript");
+                                var folderOfAssets = _replaceByTemplateAddResources("script", "src", "javascript");
                                 var result =  _replaceByTemplateAddResources("link", "href", "css");
                                 folderOfAssets = folderOfAssets || result;
                                 result = _rewriteSrcs(exportDialData.module, exportDialData.version);
                                 folderOfAssets = folderOfAssets || result;
-
-                                // TODO
-                                tiProjectService.moveProjectAssets($scope.ctx.selectedProject, exportDialData.module, exportDialData.version, folderOfAssets).success(function() {
-                                    tiDomSelectorService.stop();
-                                    var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
+                                var areas = _rewriteAreas();
+                                var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
+                                var projectExported = {
+                                    template: doc,
+                                    templateName: exportDialData.templateName,
+                                    areas: areas,
+                                    module: exportDialData.module,
+                                    moduleVersion: exportDialData.version,
+                                    projectName: $scope.ctx.selectedProject,
+                                    folderOfAssets: folderOfAssets
+                                };
+                                tiProjectService.exportProject(projectExported).success(function() {
                                     _displayToast("Project exported to module: " + exportDialData.module);
                                 })
                             });
@@ -99,7 +104,7 @@ angular.module('template.importer')
                         // TODO export this hardcoded info to a dedicated form
                         var area = {
                             path: _generateId(),
-                            createView: "jnt:text"
+                            createDefinition: "jnt:test"
                         };
                         $scope.ctx.lastSelectedElement.attr("ti-area", JSON.stringify(area));
                     };
@@ -137,12 +142,18 @@ angular.module('template.importer')
                     };
 
                     var _rewriteAreas = function () {
+                        var areas = [];
                         _innerDoc.find("[ti-area]").each(function (key, element) {
                             console.log("ti: apply area rule");
                             var _element = angular.element(element);
                             var areaInfo = JSON.parse(_element.attr("ti-area"));
+                            areas.push({
+                                definition: areaInfo.createDefinition,
+                                content: headers + _element.html()
+                            });
                             _element.replaceWith("<template:area path=\"" + areaInfo.path + "\"/>");
                         });
+                        return areas;
                     };
 
                     var _replaceByTemplateAddResources = function (tag, attr, type) {

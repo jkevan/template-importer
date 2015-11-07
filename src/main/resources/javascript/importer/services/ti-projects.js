@@ -17,12 +17,7 @@ angular.module('template.importer')
                 {"value": html});
         };
 
-        this.moveProjectAssets = function(project, module, version, folderOfAssets) {
-            return $http.post("/modules/api/ti/v1/export", {
-                module: module,
-                moduleVersion: version,
-                projectName: project,
-                folderOfAssets: folderOfAssets
-            });
-        }
+        this.exportProject = function(data) {
+            return $http.post("/modules/api/ti/v1/export", data);
+        };
     }]);

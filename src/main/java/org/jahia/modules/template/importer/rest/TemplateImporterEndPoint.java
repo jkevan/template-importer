@@ -1,6 +1,8 @@
 package org.jahia.modules.template.importer.rest;
 
+import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
+import org.jahia.modules.template.importer.rest.model.Area;
 import org.jahia.modules.template.importer.rest.model.Export;
 import org.jahia.registries.ServicesRegistry;
 import org.jahia.services.content.*;
@@ -9,6 +11,7 @@ import org.jahia.services.usermanager.JahiaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -42,10 +45,39 @@ public class TemplateImporterEndPoint {
                 JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(user, Constants.EDIT_WORKSPACE, null, new JCRCallback<Void>() {
                     @Override
                     public Void doInJCR(JCRSessionWrapper session) throws RepositoryException {
-                        JCRNodeWrapper projectNode = session.getNode("/sites/systemsite/files/ti-projects/" + export.getProjectName());
-                        JCRNodeWrapper moduleNode = session.getNode("/modules/" + export.getModule() + "/" + export.getModuleVersion());
+                        JCRNodeWrapper projectNode;
+                        try {
+                            projectNode = session.getNode("/sites/systemsite/files/ti-projects/" + export.getProjectName());
+                        } catch (PathNotFoundException e) {
+                            throw new IllegalArgumentException("Template importer project not found");
+                        }
+
+                        JCRNodeWrapper moduleNode;
+                        try {
+                            moduleNode = session.getNode("/modules/" + export.getModule() + "/" + export.getModuleVersion());
+                        } catch (PathNotFoundException e) {
+                            throw new IllegalArgumentException("Module not found");
+                        }
+
+                        if(!moduleNode.hasNode("sources")) {
+                            throw new IllegalArgumentException("Module " + export.getModule() + " don't have mounted sources");
+                        }
+
                         JCRNodeWrapper folderOfAssetsNode = projectNode.getNode(export.getFolderOfAssets());
                         JCRNodeWrapper templateFile = moduleNode.getNode("templates/files");
+                        JCRNodeWrapper resourcesNode = moduleNode.getNode("sources/src/main/resources");
+
+                        if(!resourcesNode.hasNode("javascript")) {
+                            resourcesNode.addNode("javascript", "jnt:javascriptFolder");
+                        }
+
+                        if(!resourcesNode.hasNode("css")) {
+                            resourcesNode.addNode("css", "jnt:cssFolder");
+                        }
+
+                        if(!resourcesNode.hasNode("jnt_template")) {
+                            resourcesNode.addNode("jnt_template", "jnt:cssFolder");
+                        }
 
                         JCRNodeIteratorWrapper assets = folderOfAssetsNode.getNodes();
                         while (assets.hasNext()){
@@ -60,12 +92,44 @@ public class TemplateImporterEndPoint {
                             }
                         }
 
+                        createViewForType(resourcesNode, "jnt:template", export.getTemplate(), export.getTemplateName());
+                        for (Area area : export.getAreas()) {
+                            createViewForType(resourcesNode, area.getDefinition(), area.getContent(), null);
+                        }
+
+                        session.save();
                         return null;
                     }
                 });
             } catch (RepositoryException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void createViewForType (JCRNodeWrapper resourcesNode, String type, String content, String view) throws RepositoryException {
+        JCRNodeWrapper nodeTypeFolderNode;
+        String normalizedNodeTypeName = type.replace(":", "_");
+        if(!resourcesNode.hasNode(normalizedNodeTypeName)) {
+            nodeTypeFolderNode = resourcesNode.addNode(normalizedNodeTypeName, "jnt:nodeTypeFolder");
+        } else {
+            nodeTypeFolderNode = resourcesNode.getNode(normalizedNodeTypeName);
+        }
+
+        JCRNodeWrapper templateTypeFolderNode;
+        if(!nodeTypeFolderNode.hasNode("html")) {
+            templateTypeFolderNode = nodeTypeFolderNode.addNode("html", "jnt:templateTypeFolder");
+        } else {
+            templateTypeFolderNode = nodeTypeFolderNode.getNode("html");
+        }
+
+        String viewFileName = StringUtils.substringAfterLast(type, ":") + (view != null ? ("." + view) : "") + ".jsp";
+        if(templateTypeFolderNode.hasNode(viewFileName)) {
+            throw new IllegalArgumentException("Can't create view :" + viewFileName + "view already exist");
+        } else {
+            JCRNodeWrapper viewNode = templateTypeFolderNode.addNode(viewFileName, "jnt:viewFile");
+            viewNode.setProperty("sourceCode", content);
+            viewNode.setProperty("nodeTypeName", type);
         }
     }
 

@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * Created by kevan on 07/11/15.
@@ -19,6 +20,12 @@ public class Export {
     String moduleVersion;
     @XmlElement
     String folderOfAssets;
+    @XmlElement
+    String template;
+    @XmlElement
+    String templateName;
+    @XmlElement
+    List<Area> areas;
 
     public Export() {
     }
@@ -53,5 +60,29 @@ public class Export {
 
     public void setFolderOfAssets(String folderOfAssets) {
         this.folderOfAssets = folderOfAssets;
+    }
+
+    public String getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(String template) {
+        this.template = template;
+    }
+
+    public List<Area> getAreas() {
+        return areas;
+    }
+
+    public void setAreas(List<Area> areas) {
+        this.areas = areas;
+    }
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
     }
 }
