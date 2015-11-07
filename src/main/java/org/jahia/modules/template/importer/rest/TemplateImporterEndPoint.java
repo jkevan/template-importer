@@ -1,10 +1,10 @@
 package org.jahia.modules.template.importer.rest;
 
 import org.jahia.api.Constants;
+import org.jahia.modules.template.importer.rest.model.Export;
 import org.jahia.registries.ServicesRegistry;
-import org.jahia.services.content.JCRCallback;
-import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
+import org.jahia.services.content.*;
+import org.jahia.services.content.decorator.JCRFileNode;
 import org.jahia.services.usermanager.JahiaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.RepositoryException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
@@ -24,6 +21,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/api/ti/v1")
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class TemplateImporterEndPoint {
     private static final Logger logger = LoggerFactory.getLogger(TemplateImporterEndPoint.class);
 
@@ -35,15 +33,33 @@ public class TemplateImporterEndPoint {
         return "test success";
     }
 
-    @GET
-    @Path("/export/{project}/{module}/{version}")
-    public void exportProjectToModule(@PathParam("project") String project, @PathParam("module") String module, @PathParam("module") String version) {
+    @POST
+    @Path("/export")
+    public void exportProjectToModule(final Export export) {
         JahiaUser user = getCurrentUser();
         if(user != null) {
             try {
                 JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(user, Constants.EDIT_WORKSPACE, null, new JCRCallback<Void>() {
                     @Override
-                    public Void doInJCR(JCRSessionWrapper jcrSessionWrapper) throws RepositoryException {
+                    public Void doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                        JCRNodeWrapper projectNode = session.getNode("/sites/systemsite/files/ti-projects/" + export.getProjectName());
+                        JCRNodeWrapper moduleNode = session.getNode("/modules/" + export.getModule() + "/" + export.getModuleVersion());
+                        JCRNodeWrapper folderOfAssetsNode = projectNode.getNode(export.getFolderOfAssets());
+                        JCRNodeWrapper templateFile = moduleNode.getNode("templates/files");
+
+                        JCRNodeIteratorWrapper assets = folderOfAssetsNode.getNodes();
+                        while (assets.hasNext()){
+                            JCRFileNode asset = (JCRFileNode) assets.next();
+                            String contentType = asset.getFileContent().getContentType();
+                            if("text/javascript".equals(contentType)) {
+                                asset.copy(moduleNode.getPath() + "/sources/src/main/resources/javascript");
+                            } else if("text/css".equals(contentType)) {
+                                asset.copy(moduleNode.getPath() + "/sources/src/main/resources/css");
+                            } else {
+                                templateFile.uploadFile(asset.getName(), asset.getFileContent().downloadFile(), contentType);
+                            }
+                        }
+
                         return null;
                     }
                 });

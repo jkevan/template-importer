@@ -15,5 +15,14 @@ angular.module('template.importer')
             return $http.put(this.buildURL(undefined, undefined, "paths",
                 "/sites/systemsite/files/ti-projects/" + project + "/index.html/jcr:content/properties/jcr:data"),
                 {"value": html});
+        };
+
+        this.moveProjectAssets = function(project, module, version, folderOfAssets) {
+            return $http.post("/modules/api/ti/v1/export", {
+                module: module,
+                moduleVersion: version,
+                projectName: project,
+                folderOfAssets: folderOfAssets
+            });
         }
     }]);

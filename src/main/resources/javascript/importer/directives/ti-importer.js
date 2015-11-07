@@ -19,6 +19,23 @@ angular.module('template.importer')
                         }
                     };
 
+                    var headers = "<%@ page language=\"java\" contentType=\"text/html;charset=UTF-8\" %> \
+                    <!DOCTYPE html> \
+                    <%@ taglib prefix=\"template\" uri=\"http://www.jahia.org/tags/templateLib\" %> \
+                    <%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/core\" %> \
+                    <%@ taglib prefix=\"fn\" uri=\"http://java.sun.com/jsp/jstl/functions\" %> \
+                    <%@ taglib prefix=\"jcr\" uri=\"http://www.jahia.org/tags/jcr\" %> \
+                    <%@ taglib prefix=\"fmt\" uri=\"http://java.sun.com/jstl/fmt_rt\" %> \
+                    <%@ taglib prefix=\"functions\" uri=\"http://www.jahia.org/tags/functions\" %> \
+                    <%--@elvariable id=\"currentNode\" type=\"org.jahia.services.content.JCRNodeWrapper\"--%> \
+                    <%--@elvariable id=\"out\" type=\"java.io.PrintWriter\"--%> \
+                    <%--@elvariable id=\"script\" type=\"org.jahia.services.render.scripting.Script\"--%> \
+                    <%--@elvariable id=\"scriptInfo\" type=\"java.lang.String\"--%> \
+                    <%--@elvariable id=\"workspace\" type=\"java.lang.String\"--%> \
+                    <%--@elvariable id=\"renderContext\" type=\"org.jahia.services.render.RenderContext\"--%> \
+                    <%--@elvariable id=\"currentResource\" type=\"org.jahia.services.render.Resource\"--%> \
+                    <%--@elvariable id=\"url\" type=\"org.jahia.services.render.URLGenerator\"--%>";
+
                     tiProjectService.getProjects().success(function (data) {
                         if (data && data.children) {
                             angular.forEach(data.children, function (child, nodeName) {
@@ -58,15 +75,23 @@ angular.module('template.importer')
                     $scope.exportProject = function ($event) {
                         $mdDialog.show(tiDialogs.getExportProjectDialog($event, $scope.ctx.selectedProject))
                             .then(function (exportDialData) {
+                                $scope.ctx.loading = true;
                                 console.log("ti: exporting project " + $scope.ctx.selectedProject + " to module: " + exportDialData.module + " " + exportDialData.version);
 
+                                var folderOfAssets = undefined;
                                 _rewriteAreas();
-                                _replaceByTemplateAddResources("script", "src", "javascript");
-                                _replaceByTemplateAddResources("link", "href", "css");
-                                _rewriteSrcs(exportDialData.module, exportDialData.version);
+                                folderOfAssets = _replaceByTemplateAddResources("script", "src", "javascript");
+                                var result =  _replaceByTemplateAddResources("link", "href", "css");
+                                folderOfAssets = folderOfAssets || result;
+                                result = _rewriteSrcs(exportDialData.module, exportDialData.version);
+                                folderOfAssets = folderOfAssets || result;
 
                                 // TODO
-                                _displayToast("Project exported to module: " + exportDialData.module);
+                                tiProjectService.moveProjectAssets($scope.ctx.selectedProject, exportDialData.module, exportDialData.version, folderOfAssets).success(function() {
+                                    tiDomSelectorService.stop();
+                                    var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
+                                    _displayToast("Project exported to module: " + exportDialData.module);
+                                })
                             });
                     };
 
@@ -121,19 +146,25 @@ angular.module('template.importer')
                     };
 
                     var _replaceByTemplateAddResources = function (tag, attr, type) {
+                        var folder = undefined;
                         _innerDoc.find(tag + "[" + attr + "^='./']").each(function (key, element) {
                             var _element = angular.element(element);
                             var attrValue = _element.attr(attr);
+                            folder = attrValue.split("/")[1]; // TODO this is dirty to find the folder of ressources try an other way
                             _element.replaceWith("<template:addResources type=\"" + type + "\"  resources=\"" + attrValue.substring(attrValue.lastIndexOf("/") + 1) + "\"/>")
                         });
+                        return folder;
                     };
 
                     var _rewriteSrcs = function (module, version) {
+                        var folder = undefined;
                         _innerDoc.find("[src^='./']").each(function (key, element) {
                             var _element = angular.element(element);
                             var attrValue = _element.attr("src");
+                            folder = attrValue.split("/")[1]; // TODO this is dirty to find the folder of ressources try an other way
                             _element.attr("src", "/files/default/modules/" + module + "/" + version + "/templates/files/" + attrValue.substring(attrValue.lastIndexOf("/") + 1));
                         });
+                        return folder;
                     };
 
                     var _displayToast = function (message) {

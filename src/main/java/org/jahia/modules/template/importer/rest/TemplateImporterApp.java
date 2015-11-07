@@ -1,5 +1,8 @@
 package org.jahia.modules.template.importer.rest;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +16,8 @@ public class TemplateImporterApp extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<>();
         classes.add(TemplateImporterEndPoint.class);
+        classes.add(JacksonJaxbJsonProvider.class);
+        classes.add(MultiPartFeature.class);
         return classes;
     }
 }
