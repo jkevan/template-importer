@@ -14,7 +14,9 @@ public class Area {
     @XmlElement
     String content;
     @XmlElement
-    String definition;
+    String viewType;
+    @XmlElement
+    boolean createDefinition;
 
     public Area() {
     }
@@ -27,11 +29,19 @@ public class Area {
         this.content = content;
     }
 
-    public String getDefinition() {
-        return definition;
+    public String getViewType() {
+        return viewType;
     }
 
-    public void setDefinition(String definition) {
-        this.definition = definition;
+    public void setViewType(String viewType) {
+        this.viewType = viewType;
+    }
+
+    public boolean isCreateDefinition() {
+        return createDefinition;
+    }
+
+    public void setCreateDefinition(boolean createDefinition) {
+        this.createDefinition = createDefinition;
     }
 }

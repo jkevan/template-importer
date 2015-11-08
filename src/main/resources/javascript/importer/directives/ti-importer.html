@@ -46,8 +46,16 @@
     <ti-catch-open-menu ti-open-menu="$mdOpenMenu()" ti-model="ctx.openMenuFct" md-menu-origin class="ti-menu-origin" ng-style="{left: ctx.ctxMenuPosition.left, top: ctx.ctxMenuPosition.top}"></ti-catch-open-menu>
     <md-menu-content width="4">
         <md-menu-item>
-            <md-button ng-click="exportAsArea()">
+            <md-button ng-if="!hasArea()" ng-click="exportAsArea($event)">
                 Export as area
+            </md-button>
+            <md-button ng-if="hasArea()" ng-click="removeArea()">
+                Remove area
+            </md-button>
+        </md-menu-item>
+        <md-menu-item ng-if="hasArea()">
+            <md-button ng-click="editArea()">
+                Edit area
             </md-button>
         </md-menu-item>
     </md-menu-content>

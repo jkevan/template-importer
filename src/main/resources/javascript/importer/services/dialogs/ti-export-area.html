@@ -1,0 +1,29 @@
+<md-dialog aria-label="Export project"  ng-cloak>
+    <form>
+        <md-dialog-content style="max-width:800px;max-height:810px; ">
+            <div class="md-dialog-content">
+                <md-input-container class="md-block">
+                    <label>Area path</label>
+                    <input ng-model="areaDial.path">
+                </md-input-container>
+                <md-input-container class="md-block">
+                    <label>View type</label>
+                    <input ng-model="areaDial.viewType">
+                </md-input-container>
+                <md-input-container class="md-block">
+                    <md-checkbox ng-model="areaDial.createDefinition" aria-label="Create definition">
+                        Create definition
+                    </md-checkbox>
+                </md-input-container>
+            </div>
+        </md-dialog-content>
+        <div class="md-actions" layout="row">
+            <md-button ng-click="cancel()" >
+                Cancel
+            </md-button>
+            <md-button ng-click="answer()" style="margin-right:20px;" >
+                Export area
+            </md-button>
+        </div>
+    </form>
+</md-dialog>

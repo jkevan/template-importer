@@ -94,7 +94,7 @@ public class TemplateImporterEndPoint {
 
                         createViewForType(resourcesNode, "jnt:template", export.getTemplate(), export.getTemplateName());
                         for (Area area : export.getAreas()) {
-                            createViewForType(resourcesNode, area.getDefinition(), area.getContent(), null);
+                            createViewForType(resourcesNode, area.getViewType(), area.getContent(), null);
                         }
 
                         session.save();

@@ -85,6 +85,8 @@ angular.module('template.importer')
                                 folderOfAssets = folderOfAssets || result;
                                 var areas = _rewriteAreas();
                                 var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
+                                // fix template:addresources in doc
+                                doc = doc.replace(/template:addresources/g, 'template:addResources');
                                 var projectExported = {
                                     template: doc,
                                     templateName: exportDialData.templateName,
@@ -100,13 +102,32 @@ angular.module('template.importer')
                             });
                     };
 
-                    $scope.exportAsArea = function () {
-                        // TODO export this hardcoded info to a dedicated form
-                        var area = {
-                            path: _generateId(),
-                            createDefinition: "jnt:test"
-                        };
-                        $scope.ctx.lastSelectedElement.attr("ti-area", JSON.stringify(area));
+                    $scope.exportAsArea = function ($event) {
+                        $mdDialog.show(tiDialogs.getExportAsAreaDialog($event))
+                            .then(function(areaData){
+                                $scope.ctx.lastSelectedElement.attr("ti-area", JSON.stringify(areaData));
+                                _displayToast("Area added, don't forget to save");
+                            });
+                    };
+
+                    $scope.editArea = function ($event) {
+                        $mdDialog.show(tiDialogs.getExportAsAreaDialog($event, JSON.parse($scope.ctx.lastSelectedElement.attr("ti-area"))))
+                            .then(function(areaData){
+                                $scope.ctx.lastSelectedElement.attr("ti-area", JSON.stringify(areaData));
+                                _displayToast("Area edited, don't forget to save");
+                            });
+                    };
+
+                    $scope.hasArea = function() {
+                        if($scope.ctx.lastSelectedElement) {
+                            return $scope.ctx.lastSelectedElement.attr("ti-area");
+                        }
+                        return false;
+                    };
+
+                    $scope.removeArea = function() {
+                        $scope.ctx.lastSelectedElement.removeAttr("ti-area");
+                        _displayToast("Area removed, don't forget to save");
                     };
 
                     var _initDomSelector = function () {
@@ -148,7 +169,8 @@ angular.module('template.importer')
                             var _element = angular.element(element);
                             var areaInfo = JSON.parse(_element.attr("ti-area"));
                             areas.push({
-                                definition: areaInfo.createDefinition,
+                                createDefinition: areaInfo.createDefinition,
+                                viewType: areaInfo.viewType,
                                 content: headers + _element.html()
                             });
                             _element.replaceWith("<template:area path=\"" + areaInfo.path + "\"/>");
