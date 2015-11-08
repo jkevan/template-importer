@@ -14,13 +14,7 @@
 
 You can import html project in /sites/systemSite/files/ti-project
 
-exemple: using snowboard-site.zip:
-snowboard-site.zip:
-/snowboard-site
-    /snowboard
-        /...css
-        /...js
-    /index.html
+exemple: using jahiacom.zip:
 
 the important things:
 project need to have an index.html
