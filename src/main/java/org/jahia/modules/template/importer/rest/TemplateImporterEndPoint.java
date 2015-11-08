@@ -95,6 +95,9 @@ public class TemplateImporterEndPoint {
                         createViewForType(resourcesNode, "jnt:template", export.getTemplate(), export.getTemplateName());
                         for (Area area : export.getAreas()) {
                             createViewForType(resourcesNode, area.getViewType(), area.getContent(), null);
+                            if(area.isCreateDefinition()) {
+                                createDefinition(resourcesNode, area.getViewType());
+                            }
                         }
 
                         session.save();
@@ -108,29 +111,44 @@ public class TemplateImporterEndPoint {
     }
 
     private void createViewForType (JCRNodeWrapper resourcesNode, String type, String content, String view) throws RepositoryException {
-        JCRNodeWrapper nodeTypeFolderNode;
         String normalizedNodeTypeName = type.replace(":", "_");
-        if(!resourcesNode.hasNode(normalizedNodeTypeName)) {
-            nodeTypeFolderNode = resourcesNode.addNode(normalizedNodeTypeName, "jnt:nodeTypeFolder");
-        } else {
-            nodeTypeFolderNode = resourcesNode.getNode(normalizedNodeTypeName);
-        }
-
-        JCRNodeWrapper templateTypeFolderNode;
-        if(!nodeTypeFolderNode.hasNode("html")) {
-            templateTypeFolderNode = nodeTypeFolderNode.addNode("html", "jnt:templateTypeFolder");
-        } else {
-            templateTypeFolderNode = nodeTypeFolderNode.getNode("html");
-        }
+        JCRNodeWrapper nodeTypeFolderNode = getOrCreateNode(resourcesNode, normalizedNodeTypeName, "jnt:nodeTypeFolder");
+        JCRNodeWrapper templateTypeFolderNode = getOrCreateNode(nodeTypeFolderNode, "html", "jnt:templateTypeFolder");
 
         String viewFileName = StringUtils.substringAfterLast(type, ":") + (view != null ? ("." + view) : "") + ".jsp";
         if(templateTypeFolderNode.hasNode(viewFileName)) {
-            throw new IllegalArgumentException("Can't create view :" + viewFileName + "view already exist");
+            logger.error("Can't create view " + viewFileName + ", already exist");
         } else {
             JCRNodeWrapper viewNode = templateTypeFolderNode.addNode(viewFileName, "jnt:viewFile");
             viewNode.setProperty("sourceCode", content);
             viewNode.setProperty("nodeTypeName", type);
         }
+    }
+
+    private void createDefinition(JCRNodeWrapper resourcesNode, String type) throws RepositoryException {
+        JCRNodeWrapper metainfNode = getOrCreateNode(resourcesNode, "META-INF", "jnt:metaInfFolder");
+        JCRNodeWrapper definitionNode = getOrCreateNode(metainfNode, "definitions.cnd", "jnt:definitionFile");
+
+        if(definitionNode.hasNode(type)){
+            logger.error("Can't create definition " + type + ", already exist");
+        } else {
+            JCRNodeWrapper definitionTypeNode = definitionNode.addNode(type, "jnt:primaryNodeType");
+            definitionTypeNode.setProperty("j:supertype", "jnt:content");
+            definitionTypeNode.setProperty("j:isAbstract", false);
+            definitionTypeNode.setProperty("j:hasOrderableChildNodes", false);
+            definitionTypeNode.setProperty("j:isQueryable", true);
+            definitionTypeNode.setProperty("j:mixins", new String[]{"jmix:siteComponent", "mix:title"});
+        }
+    }
+
+    private JCRNodeWrapper getOrCreateNode(JCRNodeWrapper parentNode, String name, String type) throws RepositoryException {
+        JCRNodeWrapper node;
+        if(!parentNode.hasNode(name)) {
+            node = parentNode.addNode(name, type);
+        } else {
+            node = parentNode.getNode(name);
+        }
+        return node;
     }
 
     public JahiaUser getCurrentUser() {

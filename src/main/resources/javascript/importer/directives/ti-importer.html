@@ -24,10 +24,10 @@
                 <span>{{ctx.selectedProject}}</span>
                 <!-- fill up the space between left and right area -->
                 <span flex></span>
-                <md-button  class="md-raised" ng-show="ctx.selectedProject" ng-click="saveProject()">
+                <md-button  class="md-raised" ng-show="ctx.selectedProject && !ctx.loading" ng-click="saveProject()">
                     save project
                 </md-button>
-                <md-button  class="md-raised" ng-show="ctx.selectedProject" ng-click="exportProject($event)">
+                <md-button  class="md-raised" ng-show="ctx.selectedProject && !ctx.loading" ng-click="exportProject($event)">
                     export project
                 </md-button>
             </div>
