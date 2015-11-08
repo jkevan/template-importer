@@ -171,7 +171,7 @@ angular.module('template.importer')
                             areas.push({
                                 createDefinition: areaInfo.createDefinition,
                                 viewType: areaInfo.viewType,
-                                content: headers + _element.html()
+                                content: headers + _element[0].outerHTML
                             });
                             _element.replaceWith("<template:area path=\"" + areaInfo.path + "\"/>");
                         });
