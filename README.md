@@ -72,3 +72,31 @@ I suggest to create a new empty templateSet from the studio and use it as target
     - associated definition for exported areas if checkbox checked.
 
 - Then you can use this new template as template for the home page for example and start working on it. And at the end use it for creating a site.
+
+### Technical:
+
+- This application is a full angularjs app, dependencies:
+    - importer/libs/jquery.min.js,
+    - importer/libs/angular.min.js,
+    - importer/libs/angular-route.min.js,
+    - importer/libs/angular-animate.min.js,
+    - importer/libs/angular-aria.min.js,
+    - importer/libs/angular-material.min.js,
+    - importer/libs/underscore-min.js,
+    - importer/libs/underscore.string.min.js
+
+- A custom directive have been develop to wrap the all application
+```
+<ti-importer></ti-importer>
+```
+
+- Angularjs material is used to create the UIs, dialogs, circular loading, bottom left messages, context menu on rigth click
+
+- some code have been reused from marketing factory modules, like the iframe-on-load directive to be able to run a callback after the loading of an iframe
+This allow to attach some listener inside the iframe or modify the DOM.
+
+- A dedicated service have been develop to provide the visual dom selector. the original inspiration come from https://github.com/andrewchilds/jQuery.DomOutline
+But have been rewrite and adapted to fit needed and used in angularjs app.
+
+- A custom end point is also provide to trigger some action server side, like the export of the all project. So it's done one time. (this part can really be improved,
+just support the minimal needs)
