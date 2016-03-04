@@ -20,4 +20,8 @@ angular.module('template.importer')
         this.exportProject = function(data) {
             return $http.post("/modules/api/ti/v1/export", data);
         };
+
+        this.exportPage = function(data) {
+            return $http.post("/modules/api/ti/v1/exportPage", data);
+        };
     }]);

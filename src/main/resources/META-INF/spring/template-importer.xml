@@ -2,7 +2,19 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-    <bean class="">
-        <property name="name" value="value"/>
+
+    <bean id="overrideTemplateNodeFilter" class="org.jahia.modules.template.importer.filter.TemplateNodeFilter">
+        <property name="priority" value="22"/>
+        <property name="description" value="overide default Template node filter for static pages"/>
+        <property name="applyOnConfigurations" value="page"/>
+        <property name="applyOnNodeTypes" value="jnt:tiStaticPage"/>
+        <property name="applyOnTemplateTypes" value="html,html-.+"/>
+    </bean>
+
+    <bean id="overrideTemplateScriptFilter" class="org.jahia.modules.template.importer.filter.TemplateScriptFilter">
+        <property name="priority" value="99"/>
+        <property name="description" value="overide default Template script filter for static pages"/>
+        <property name="applyOnNodeTypes" value="jnt:tiStaticPage"/>
+        <property name="jahiaTemplateManagerService" ref="JahiaTemplateManagerService" />
     </bean>
 </beans>

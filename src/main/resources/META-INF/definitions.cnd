@@ -5,3 +5,6 @@
 
 [jnt:tiProject] > jnt:folder
 - j:page (string)
+
+[jnt:tiStaticPage] > jnt:page
+- j:staticTemplate (string) nofulltext

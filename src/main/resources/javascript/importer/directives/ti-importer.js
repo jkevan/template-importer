@@ -78,30 +78,32 @@ angular.module('template.importer')
                                 console.log("ti: exporting project " + $scope.ctx.selectedProject + " to module: " + exportDialData.module + " " + exportDialData.version);
                                 tiDomSelectorService.stop();
 
-                                var folderOfAssets = _replaceByTemplateAddResources("script", "src", "javascript");
+                                /*var folderOfAssets = _replaceByTemplateAddResources("script", "src", "javascript");
                                 var result =  _replaceByTemplateAddResources("link", "href", "css");
                                 folderOfAssets = folderOfAssets || result;
                                 result = _rewriteSrcs(exportDialData.module, exportDialData.version);
                                 folderOfAssets = folderOfAssets || result;
-                                var areas = _rewriteAreas();
+                                */
+                                //var areas = _rewriteAreas();
+                                var bigtexts = _rewriteBigtexts();
                                 var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
                                 // fix template:addresources in doc
-                                doc = doc.replace(/template:addresources/g, 'template:addResources');
+                                // doc = doc.replace(/template:addresources/g, 'template:addResources');
                                 var projectExported = {
                                     template: doc,
-                                    templateName: exportDialData.templateName,
-                                    areas: areas,
-                                    module: exportDialData.module,
-                                    moduleVersion: exportDialData.version,
-                                    projectName: $scope.ctx.selectedProject,
-                                    folderOfAssets: folderOfAssets
+                                    pageName: exportDialData.pageName,
+                                    bigtexts: bigtexts,
+                                    parentPage: "/sites/ACMESPACE/home",
+                                    siteKey: "ACMESPACE",
+                                    projectName: $scope.ctx.selectedProject
                                 };
-                                tiProjectService.exportProject(projectExported).success(function() {
-                                    _displayToast("Project exported to module: " + exportDialData.module);
+                                tiProjectService.exportPage(projectExported).success(function() {
+                                    _displayToast("Static page exported under page: " + "/sites/ACMESPACE/home");
                                 })
                             });
                     };
 
+                    // TODO factorise area and bigtext functions in one, and export ti-area and ti-bigtext in and array
                     $scope.exportAsArea = function ($event) {
                         $mdDialog.show(tiDialogs.getExportAsAreaDialog($event))
                             .then(function(areaData){
@@ -118,11 +120,43 @@ angular.module('template.importer')
                             });
                     };
 
+                    $scope.exportAsBigtext = function ($event) {
+                        $mdDialog.show(tiDialogs.getExportAsBigTextDialog($event))
+                            .then(function(bigTextData){
+                                $scope.ctx.lastSelectedElement.attr("ti-bigtext", JSON.stringify(bigTextData));
+                                _displayToast("Bigtext added, don't forget to save");
+                            });
+                    };
+
+                    $scope.editBigtext = function ($event) {
+                        $mdDialog.show(tiDialogs.getExportAsBigTextDialog($event, JSON.parse($scope.ctx.lastSelectedElement.attr("ti-bigtext"))))
+                            .then(function(bigTextData){
+                                $scope.ctx.lastSelectedElement.attr("ti-bigtext", JSON.stringify(bigTextData));
+                                _displayToast("Bigtext edited, don't forget to save");
+                            });
+                    };
+
                     $scope.hasArea = function() {
                         if($scope.ctx.lastSelectedElement) {
                             return $scope.ctx.lastSelectedElement.attr("ti-area");
                         }
                         return false;
+                    };
+
+                    $scope.hasBigtext = function() {
+                        if($scope.ctx.lastSelectedElement) {
+                            return $scope.ctx.lastSelectedElement.attr("ti-bigtext");
+                        }
+                        return false;
+                    };
+
+                    $scope.hasRule = function() {
+                        return $scope.hasArea() || $scope.hasBigtext();
+                    };
+
+                    $scope.removeBigtext = function() {
+                        $scope.ctx.lastSelectedElement.removeAttr("ti-bigtext");
+                        _displayToast("Bigtext removed, don't forget to save");
                     };
 
                     $scope.removeArea = function() {
@@ -176,6 +210,23 @@ angular.module('template.importer')
                             _element.replaceWith("<template:area path=\"" + areaInfo.path + "\"/>");
                         });
                         return areas;
+                    };
+
+                    var _rewriteBigtexts = function () {
+                        var bigtexts = [];
+                        _innerDoc.find("[ti-bigtext]").each(function (key, element) {
+                            console.log("ti: apply bigtext rule");
+                            var _element = angular.element(element);
+                            var bigtextInfo = JSON.parse(_element.attr("ti-bigtext"));
+                            var id = _generateId();
+                            bigtexts.push({
+                                area: id,
+                                name: bigtextInfo.name,
+                                content: headers + _element[0].outerHTML
+                            });
+                            _element.replaceWith("<template:area path=\"" + id + "\"/>");
+                        });
+                        return bigtexts;
                     };
 
                     var _replaceByTemplateAddResources = function (tag, attr, type) {

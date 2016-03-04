@@ -50,5 +50,27 @@ angular.module('template.importer')
                 targetEvent: $event,
                 clickOutsideToClose: true
             }
+        };
+
+        this.getExportAsBigTextDialog = function($event, bigtextDial) {
+            return {
+                controller: ["$scope", "$mdDialog", function ($scope, $mdDialog) {
+                    $scope.bigtextDial = bigtextDial || {
+                            name: ""
+                        };
+
+                    $scope.cancel = function () {
+                        $mdDialog.cancel();
+                    };
+
+                    $scope.answer = function () {
+                        $mdDialog.hide($scope.bigtextDial);
+                    };
+                }],
+                templateUrl: tiContextInfos.moduleBase + "/javascript/importer/services/dialogs/ti-export-bigtext.html",
+                parent: angular.element(document.body),
+                targetEvent: $event,
+                clickOutsideToClose: true
+            }
         }
     }]);

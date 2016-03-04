@@ -3,16 +3,12 @@
         <md-dialog-content style="max-width:800px;max-height:810px; ">
             <div class="md-dialog-content">
                 <md-input-container class="md-block">
-                    <label>Module</label>
-                    <input ng-model="exportDial.module">
+                    <label>Page name</label>
+                    <input ng-model="exportDial.pageName">
                 </md-input-container>
                 <md-input-container class="md-block">
-                    <label>Version</label>
-                    <input ng-model="exportDial.version">
-                </md-input-container>
-                <md-input-container class="md-block">
-                    <label>Template name</label>
-                    <input ng-model="exportDial.templateName">
+                    <label>Parent page</label>
+                    <input value="/sites/ACMESPACE/home" type="text" ng-disabled="true">
                 </md-input-container>
             </div>
         </md-dialog-content>

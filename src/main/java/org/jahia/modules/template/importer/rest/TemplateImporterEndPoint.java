@@ -1,23 +1,30 @@
 package org.jahia.modules.template.importer.rest;
 
+import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.modules.template.importer.rest.model.Area;
 import org.jahia.modules.template.importer.rest.model.Export;
+import org.jahia.modules.template.importer.rest.model.PageExport;
 import org.jahia.registries.ServicesRegistry;
 import org.jahia.services.content.*;
 import org.jahia.services.content.decorator.JCRFileNode;
 import org.jahia.services.usermanager.JahiaUser;
+import org.jahia.settings.SettingsBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.ServletContextAware;
 
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Created by kevan on 06/11/15.
@@ -26,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TemplateImporterEndPoint {
+
     private static final Logger logger = LoggerFactory.getLogger(TemplateImporterEndPoint.class);
 
     @Context
@@ -99,6 +107,43 @@ public class TemplateImporterEndPoint {
                                 createDefinition(resourcesNode, area.getViewType());
                             }
                         }
+
+                        session.save();
+                        return null;
+                    }
+                });
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @POST
+    @Path("/exportPage")
+    public void exportProjectAsStaticPage(final PageExport export) {
+
+        final String viewName = "/tiExportStaticTemplate" + UUID.randomUUID() + ".jsp";
+        String path =  SettingsBean.getInstance().getServletContext().getRealPath(viewName);
+        try {
+            FileWriter fw = new FileWriter(path);
+            fw.write(export.getTemplate());
+            fw.close();
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        JahiaUser user = getCurrentUser();
+        if(user != null) {
+            try {
+                JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(user, Constants.EDIT_WORKSPACE, null, new JCRCallback<Void>() {
+                    @Override
+                    public Void doInJCR(JCRSessionWrapper session) throws RepositoryException {
+
+                        // page
+                        JCRNodeWrapper parentPage = session.getNode(export.getParentPage());
+                        JCRNodeWrapper staticPage = parentPage.addNode(export.getPageName(), "jnt:tiStaticPage");
+                        staticPage.setProperty("j:templateName", "default");
+                        staticPage.setProperty("j:staticTemplate", viewName);
 
                         session.save();
                         return null;
