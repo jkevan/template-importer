@@ -144,6 +144,7 @@ public class TemplateImporterEndPoint {
                         JCRNodeWrapper staticPage = parentPage.addNode(export.getPageName(), "jnt:tiStaticPage");
                         staticPage.setProperty("j:templateName", "default");
                         staticPage.setProperty("j:staticTemplate", viewName);
+                        staticPage.setProperty("jcr:title", export.getPageName());
 
                         session.save();
                         return null;

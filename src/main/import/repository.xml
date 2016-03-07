@@ -23,7 +23,6 @@
                                   jcr:primaryType="jnt:contentTemplate">
                             <pagecontent jcr:primaryType="jnt:contentList">
                                 <templateimporterapp jcr:primaryType="jnt:templateImporterApp"/>
-                                <area547323 j:allowedTypes="" jcr:primaryType="jnt:area"/>
                             </pagecontent>
                         </template-importer>
                     </server-settings-base>

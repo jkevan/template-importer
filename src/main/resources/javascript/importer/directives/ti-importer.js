@@ -71,24 +71,46 @@ angular.module('template.importer')
                         });
                     };
 
-                    $scope.exportProject = function ($event) {
+                    $scope.exportProjectTemplate = function ($event) {
                         $mdDialog.show(tiDialogs.getExportProjectDialog($event, $scope.ctx.selectedProject))
                             .then(function (exportDialData) {
                                 $scope.ctx.loading = true;
                                 console.log("ti: exporting project " + $scope.ctx.selectedProject + " to module: " + exportDialData.module + " " + exportDialData.version);
                                 tiDomSelectorService.stop();
 
-                                /*var folderOfAssets = _replaceByTemplateAddResources("script", "src", "javascript");
+                                var folderOfAssets = _replaceByTemplateAddResources("script", "src", "javascript");
                                 var result =  _replaceByTemplateAddResources("link", "href", "css");
                                 folderOfAssets = folderOfAssets || result;
                                 result = _rewriteSrcs(exportDialData.module, exportDialData.version);
                                 folderOfAssets = folderOfAssets || result;
-                                */
-                                //var areas = _rewriteAreas();
-                                var bigtexts = _rewriteBigtexts();
+                                var areas = _rewriteAreas();
                                 var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
                                 // fix template:addresources in doc
-                                // doc = doc.replace(/template:addresources/g, 'template:addResources');
+                                doc = doc.replace(/template:addresources/g, 'template:addResources');
+                                var projectExported = {
+                                    template: doc,
+                                    templateName: exportDialData.templateName,
+                                    areas: areas,
+                                    module: exportDialData.module,
+                                    moduleVersion: exportDialData.version,
+                                    projectName: $scope.ctx.selectedProject,
+                                    folderOfAssets: folderOfAssets
+                                };
+                                tiProjectService.exportProject(projectExported).success(function() {
+                                    _displayToast("Project exported to module: " + exportDialData.module);
+                                })
+                            });
+                    };
+
+                    $scope.exportProjectPage = function ($event) {
+                        $mdDialog.show(tiDialogs.getExportProjectPageDialog($event, $scope.ctx.selectedProject))
+                            .then(function (exportDialData) {
+                                $scope.ctx.loading = true;
+                                console.log("ti: exporting project " + $scope.ctx.selectedProject + " to module: " + exportDialData.module + " " + exportDialData.version);
+                                tiDomSelectorService.stop();
+                                var bigtexts = _rewriteBigtexts();
+                                var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
+
                                 var projectExported = {
                                     template: doc,
                                     pageName: exportDialData.pageName,

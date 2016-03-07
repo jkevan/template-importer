@@ -1,7 +1,9 @@
 angular.module('template.importer')
 
     .service('tiDialogs', ['tiContextInfos', function (tiContextInfos) {
-        this.getExportProjectDialog = function($event, projectName) {
+
+        // TODO factorise the export functions in a single one
+        this.getExportProjectTemplateDialog = function($event, projectName) {
             return {
                 controller: ["$scope", "$mdDialog", function ($scope, $mdDialog) {
                     // TODO drop downlist of available modules
@@ -18,7 +20,29 @@ angular.module('template.importer')
                         $mdDialog.hide($scope.exportDial);
                     };
                 }],
-                templateUrl: tiContextInfos.moduleBase + "/javascript/importer/services/dialogs/ti-export-project.html",
+                templateUrl: tiContextInfos.moduleBase + "/javascript/importer/services/dialogs/ti-export-project-template.html",
+                parent: angular.element(document.body),
+                targetEvent: $event,
+                clickOutsideToClose: true
+            }
+        };
+
+        this.getExportProjectPageDialog = function($event, projectName) {
+            return {
+                controller: ["$scope", "$mdDialog", function ($scope, $mdDialog) {
+                    // TODO drop downlist of available modules
+                    $scope.exportDial = {
+
+                    };
+
+                    $scope.cancel = function () {
+                        $mdDialog.cancel();
+                    };
+                    $scope.answer = function () {
+                        $mdDialog.hide($scope.exportDial);
+                    };
+                }],
+                templateUrl: tiContextInfos.moduleBase + "/javascript/importer/services/dialogs/ti-export-project-page.html",
                 parent: angular.element(document.body),
                 targetEvent: $event,
                 clickOutsideToClose: true
@@ -56,7 +80,7 @@ angular.module('template.importer')
             return {
                 controller: ["$scope", "$mdDialog", function ($scope, $mdDialog) {
                     $scope.bigtextDial = bigtextDial || {
-                            name: ""
+                            name: _generateId()
                         };
 
                     $scope.cancel = function () {
