@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 
 /**
  * Created by jkevan on 02/03/2016.
+ * CALL only when tiStaticPage is display as main ressource
  */
 public class TemplateNodeFilter extends AbstractFilter{
     private static Logger logger = org.slf4j.LoggerFactory.getLogger(TemplateNodeFilter.class);
