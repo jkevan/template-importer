@@ -4,6 +4,7 @@ import org.apache.commons.id.uuid.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.modules.template.importer.rest.model.Area;
+import org.jahia.modules.template.importer.rest.model.Bigtext;
 import org.jahia.modules.template.importer.rest.model.Export;
 import org.jahia.modules.template.importer.rest.model.PageExport;
 import org.jahia.registries.ServicesRegistry;
@@ -13,11 +14,9 @@ import org.jahia.services.usermanager.JahiaUser;
 import org.jahia.settings.SettingsBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.ServletContextAware;
 
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
@@ -25,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Created by kevan on 06/11/15.
@@ -135,7 +135,8 @@ public class TemplateImporterEndPoint {
         JahiaUser user = getCurrentUser();
         if(user != null) {
             try {
-                JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(user, Constants.EDIT_WORKSPACE, null, new JCRCallback<Void>() {
+                // TODO hardcoded locale
+                JCRTemplate.getInstance().doExecuteWithSystemSessionAsUser(user, Constants.EDIT_WORKSPACE, Locale.ENGLISH, new JCRCallback<Void>() {
                     @Override
                     public Void doInJCR(JCRSessionWrapper session) throws RepositoryException {
 
@@ -154,6 +155,7 @@ public class TemplateImporterEndPoint {
                         JCRNodeWrapper staticPage = parentPage.addNode(export.getPageName(), "jnt:tiStaticPage");
                         staticPage.setProperty("j:templateName", "default");
                         staticPage.setProperty("j:staticTemplate", viewName);
+                        staticPage.setProperty("jcr:title", export.getPageName());
 
 
                         // assets
@@ -163,7 +165,16 @@ public class TemplateImporterEndPoint {
                             JCRFileNode asset = (JCRFileNode) assets.next();
                             asset.copy(fileFolder.getPath());
                         }
+                        session.save();
 
+                        // bigtexts
+                        if(export.getBigtexts() != null && export.getBigtexts().size() > 0) {
+                            for (Bigtext bigtext : export.getBigtexts()) {
+                                JCRNodeWrapper contentList = staticPage.addNode(bigtext.getArea(), "jnt:contentList");
+                                JCRNodeWrapper bigtextNode = contentList.addNode(bigtext.getName(), "jnt:bigText");
+                                bigtextNode.setProperty("text", bigtext.getContent());
+                            }
+                        }
                         session.save();
                         return null;
                     }

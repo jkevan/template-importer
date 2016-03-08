@@ -109,8 +109,8 @@ angular.module('template.importer')
                                 console.log("ti: exporting project " + $scope.ctx.selectedProject + " to module: " + exportDialData.module + " " + exportDialData.version);
                                 tiDomSelectorService.stop();
 
-                                var folderOfAssets = _rewritePageLinks(exportDialData.parentPage, exportDialData.pageName);
-                                var bigtexts = _rewriteBigtexts();
+                                var bigtexts = _rewriteBigtexts(exportDialData.parentPage, exportDialData.pageName);
+                                var folderOfAssets = _rewritePageLinks();
                                 var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
 
                                 var projectExported = {
@@ -237,17 +237,24 @@ angular.module('template.importer')
                         return areas;
                     };
 
-                    var _rewriteBigtexts = function () {
+                    var _rewriteBigtexts = function (parentPage, pageName) {
                         var bigtexts = [];
                         _innerDoc.find("[ti-bigtext]").each(function (key, element) {
                             console.log("ti: apply bigtext rule");
                             var _element = angular.element(element);
+
+                            _element.find("[src^='./']").each(function (key, element) {
+                                var _find = angular.element(element);
+                                var attrValue = _find.attr("src");
+                                _find.attr("src", "/files/{workspace}" + parentPage + "/" + pageName + "/files/" + attrValue.substring(attrValue.lastIndexOf("/") + 1));
+                            });
+
                             var bigtextInfo = JSON.parse(_element.attr("ti-bigtext"));
                             var id = _generateId();
                             bigtexts.push({
                                 area: id,
                                 name: bigtextInfo.name,
-                                content: headers + _element[0].outerHTML
+                                content: _element[0].outerHTML
                             });
                             _element.replaceWith("<template:area path=\"" + id + "\"/>");
                         });
@@ -265,7 +272,7 @@ angular.module('template.importer')
                         return folder;
                     };
 
-                    var _rewritePageLinks = function (parentPath, pageName) {
+                    var _rewritePageLinks = function () {
                         var folder = undefined;
                         _innerDoc.find("[src^='./']").each(function (key, element) {
                             var _element = angular.element(element);
