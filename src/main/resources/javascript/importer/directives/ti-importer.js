@@ -81,7 +81,7 @@ angular.module('template.importer')
                                 var folderOfAssets = _replaceByTemplateAddResources("script", "src", "javascript");
                                 var result =  _replaceByTemplateAddResources("link", "href", "css");
                                 folderOfAssets = folderOfAssets || result;
-                                result = _rewriteSrcs(exportDialData.module, exportDialData.version);
+                                result = _rewriteModuleSrcs(exportDialData.module, exportDialData.version);
                                 folderOfAssets = folderOfAssets || result;
                                 var areas = _rewriteAreas();
                                 var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
@@ -108,6 +108,8 @@ angular.module('template.importer')
                                 $scope.ctx.loading = true;
                                 console.log("ti: exporting project " + $scope.ctx.selectedProject + " to module: " + exportDialData.module + " " + exportDialData.version);
                                 tiDomSelectorService.stop();
+
+                                var folderOfAssets = _rewritePageLinks(exportDialData.parentPage, exportDialData.pageName);
                                 var bigtexts = _rewriteBigtexts();
                                 var doc = headers + "\r\n" + new XMLSerializer().serializeToString(_innerDoc.get(0).doctype) + "\r\n" + _innerDoc.get(0).documentElement.outerHTML;
 
@@ -115,12 +117,13 @@ angular.module('template.importer')
                                     template: doc,
                                     pageName: exportDialData.pageName,
                                     bigtexts: bigtexts,
-                                    parentPage: "/sites/ACMESPACE/home",
+                                    parentPage: exportDialData.parentPage,
                                     siteKey: "ACMESPACE",
-                                    projectName: $scope.ctx.selectedProject
+                                    projectName: $scope.ctx.selectedProject,
+                                    folderOfAssets: folderOfAssets
                                 };
                                 tiProjectService.exportPage(projectExported).success(function() {
-                                    _displayToast("Static page exported under page: " + "/sites/ACMESPACE/home");
+                                    _displayToast("Static page exported under page: " + exportDialData.parentPage);
                                 })
                             });
                     };
@@ -262,7 +265,24 @@ angular.module('template.importer')
                         return folder;
                     };
 
-                    var _rewriteSrcs = function (module, version) {
+                    var _rewritePageLinks = function (parentPath, pageName) {
+                        var folder = undefined;
+                        _innerDoc.find("[src^='./']").each(function (key, element) {
+                            var _element = angular.element(element);
+                            var attrValue = _element.attr("src");
+                            folder = attrValue.split("/")[1]; // TODO this is dirty to find the folder of ressources try an other way
+                            _element.attr("src", "/files/${renderContext.workspace}${currentNode.path}/files/" + attrValue.substring(attrValue.lastIndexOf("/") + 1));
+                        });
+                        _innerDoc.find("link[href^='./']").each(function (key, element) {
+                            var _element = angular.element(element);
+                            var attrValue = _element.attr("href");
+                            folder = attrValue.split("/")[1]; // TODO this is dirty to find the folder of ressources try an other way
+                            _element.attr("href", "/files/${renderContext.workspace}${currentNode.path}/files/" + attrValue.substring(attrValue.lastIndexOf("/") + 1));
+                        });
+                        return folder;
+                    };
+
+                    var _rewriteModuleSrcs = function (module, version) {
                         var folder = undefined;
                         _innerDoc.find("[src^='./']").each(function (key, element) {
                             var _element = angular.element(element);

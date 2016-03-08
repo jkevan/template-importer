@@ -24,6 +24,8 @@ public class PageExport {
     String template;
     @XmlElement
     List<Bigtext> bigtexts;
+    @XmlElement
+    String folderOfAssets;
 
     public PageExport() {
     }
@@ -74,5 +76,13 @@ public class PageExport {
 
     public void setBigtexts(List<Bigtext> bigtexts) {
         this.bigtexts = bigtexts;
+    }
+
+    public String getFolderOfAssets() {
+        return folderOfAssets;
+    }
+
+    public void setFolderOfAssets(String folderOfAssets) {
+        this.folderOfAssets = folderOfAssets;
     }
 }

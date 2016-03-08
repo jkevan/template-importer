@@ -139,12 +139,30 @@ public class TemplateImporterEndPoint {
                     @Override
                     public Void doInJCR(JCRSessionWrapper session) throws RepositoryException {
 
+                        JCRNodeWrapper projectNode;
+                        try {
+                            projectNode = session.getNode("/sites/systemsite/files/ti-projects/" + export.getProjectName());
+                        } catch (PathNotFoundException e) {
+                            throw new IllegalArgumentException("Template importer project not found");
+                        }
+
+                        JCRNodeWrapper folderOfAssetsNode = projectNode.getNode(export.getFolderOfAssets());
+
+
                         // page
                         JCRNodeWrapper parentPage = session.getNode(export.getParentPage());
                         JCRNodeWrapper staticPage = parentPage.addNode(export.getPageName(), "jnt:tiStaticPage");
                         staticPage.setProperty("j:templateName", "default");
                         staticPage.setProperty("j:staticTemplate", viewName);
-                        staticPage.setProperty("jcr:title", export.getPageName());
+
+
+                        // assets
+                        JCRNodeWrapper fileFolder = staticPage.addNode("files", "jnt:folder");
+                        JCRNodeIteratorWrapper assets = folderOfAssetsNode.getNodes();
+                        while (assets.hasNext()){
+                            JCRFileNode asset = (JCRFileNode) assets.next();
+                            asset.copy(fileFolder.getPath());
+                        }
 
                         session.save();
                         return null;

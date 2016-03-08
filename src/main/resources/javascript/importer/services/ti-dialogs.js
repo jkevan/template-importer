@@ -32,7 +32,7 @@ angular.module('template.importer')
                 controller: ["$scope", "$mdDialog", function ($scope, $mdDialog) {
                     // TODO drop downlist of available modules
                     $scope.exportDial = {
-
+                        parentPage: "/sites/ACMESPACE/home"
                     };
 
                     $scope.cancel = function () {
@@ -77,6 +77,10 @@ angular.module('template.importer')
         };
 
         this.getExportAsBigTextDialog = function($event, bigtextDial) {
+            var _generateId = function () {
+                return '_' + Math.random().toString(36).substr(2, 9);
+            };
+
             return {
                 controller: ["$scope", "$mdDialog", function ($scope, $mdDialog) {
                     $scope.bigtextDial = bigtextDial || {
